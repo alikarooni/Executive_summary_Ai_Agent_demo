@@ -1,19 +1,19 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {
+    "net8.0": {
       "DocumentFormat.OpenXml/3.0.2": {
         "type": "package",
         "dependencies": {
           "DocumentFormat.OpenXml.Framework": "3.0.2"
         },
         "compile": {
-          "lib/netstandard2.0/DocumentFormat.OpenXml.dll": {
+          "lib/net8.0/DocumentFormat.OpenXml.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/DocumentFormat.OpenXml.dll": {
+          "lib/net8.0/DocumentFormat.OpenXml.dll": {
             "related": ".xml"
           }
         }
@@ -24,12 +24,12 @@
           "System.IO.Packaging": "8.0.0"
         },
         "compile": {
-          "lib/net6.0/DocumentFormat.OpenXml.Framework.dll": {
+          "lib/net8.0/DocumentFormat.OpenXml.Framework.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/DocumentFormat.OpenXml.Framework.dll": {
+          "lib/net8.0/DocumentFormat.OpenXml.Framework.dll": {
             "related": ".xml"
           }
         }
@@ -59,12 +59,12 @@
       "Syncfusion.Compression.Net.Core/25.1.35": {
         "type": "package",
         "compile": {
-          "lib/net6.0/Syncfusion.Compression.Portable.dll": {
+          "lib/net8.0/Syncfusion.Compression.Portable.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/Syncfusion.Compression.Portable.dll": {
+          "lib/net8.0/Syncfusion.Compression.Portable.dll": {
             "related": ".xml"
           }
         }
@@ -72,10 +72,10 @@
       "Syncfusion.Licensing/25.1.35": {
         "type": "package",
         "compile": {
-          "lib/net6.0/Syncfusion.Licensing.dll": {}
+          "lib/net8.0/Syncfusion.Licensing.dll": {}
         },
         "runtime": {
-          "lib/net6.0/Syncfusion.Licensing.dll": {}
+          "lib/net8.0/Syncfusion.Licensing.dll": {}
         }
       },
       "Syncfusion.Pdf.Net.Core/25.1.35": {
@@ -86,12 +86,12 @@
           "System.Text.Encoding.CodePages": "4.4.0"
         },
         "compile": {
-          "lib/net6.0/Syncfusion.Pdf.Portable.dll": {
+          "lib/net8.0/Syncfusion.Pdf.Portable.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/Syncfusion.Pdf.Portable.dll": {
+          "lib/net8.0/Syncfusion.Pdf.Portable.dll": {
             "related": ".xml"
           }
         }
@@ -99,12 +99,12 @@
       "System.IO.Packaging/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/System.IO.Packaging.dll": {
+          "lib/net8.0/System.IO.Packaging.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/System.IO.Packaging.dll": {
+          "lib/net8.0/System.IO.Packaging.dll": {
             "related": ".xml"
           }
         },
@@ -377,44 +377,38 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net6.0": [
+    "net8.0": [
       "DocumentFormat.OpenXml >= 3.0.2",
       "Newtonsoft.Json >= 13.0.3",
       "Syncfusion.Pdf.Net.Core >= 25.1.35"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ali.karooni\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\akarooni\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ali.karooni\\Documents\\_My_Projects\\Executive summary demo\\MS_Word_Creator\\MS_Word_Creator.csproj",
+      "projectUniqueName": "C:\\Users\\akarooni\\Documents\\MY_TEMP\\Projects\\Executive_summary_demo\\MS_Word_Creator\\MS_Word_Creator.csproj",
       "projectName": "MS_Word_Creator",
-      "projectPath": "C:\\Users\\ali.karooni\\Documents\\_My_Projects\\Executive summary demo\\MS_Word_Creator\\MS_Word_Creator.csproj",
-      "packagesPath": "C:\\Users\\ali.karooni\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ali.karooni\\Documents\\_My_Projects\\Executive summary demo\\MS_Word_Creator\\obj\\",
+      "projectPath": "C:\\Users\\akarooni\\Documents\\MY_TEMP\\Projects\\Executive_summary_demo\\MS_Word_Creator\\MS_Word_Creator.csproj",
+      "packagesPath": "C:\\Users\\akarooni\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\akarooni\\Documents\\MY_TEMP\\Projects\\Executive_summary_demo\\MS_Word_Creator\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\ali.karooni\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\akarooni\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net6.0"
+        "net8.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://nexus.devops.onyxcentersource.com/repository/nuget-hosted/": {},
-        "https://nuget.dev.onyxcentersource.com/nuget": {}
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "projectReferences": {}
         }
       },
@@ -422,11 +416,16 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
-      "net6.0": {
-        "targetAlias": "net6.0",
+      "net8.0": {
+        "targetAlias": "net8.0",
         "dependencies": {
           "DocumentFormat.OpenXml": {
             "target": "Package",
@@ -452,30 +451,15 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[6.0.28, 6.0.28]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[6.0.28, 6.0.28]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[6.0.28, 6.0.28]"
-          },
-          {
-            "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[6.0.28, 6.0.28]"
-          }
-        ],
         "frameworkReferences": {
+          "Microsoft.AspNetCore.App": {
+            "privateAssets": "none"
+          },
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.407\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

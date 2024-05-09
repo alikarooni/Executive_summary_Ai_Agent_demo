@@ -1,0 +1,18 @@
+/* src/components/Row/Row.css */
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0; /* Add padding to each row */
+  }
+  
+  .column {
+    flex: 1; /* Each column takes equal space */
+    padding: 0 10px; /* Padding inside columns */
+    min-width: 0; /* Prevents flex items from overflowing their container */
+}
+
+.textarea {
+  width: 100%; /* Ensures the textarea fills its container */
+  resize: vertical; /* Only allow vertical resizing */
+  overflow: auto; /* Adds scroll if content overflows */
+}

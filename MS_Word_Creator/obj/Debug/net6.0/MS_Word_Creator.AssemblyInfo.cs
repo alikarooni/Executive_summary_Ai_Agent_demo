@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MS_Word_Creator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+29c2efdf06dea860c3debc5683fd05a00256b6d6")]
 [assembly: System.Reflection.AssemblyProductAttribute("MS_Word_Creator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MS_Word_Creator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

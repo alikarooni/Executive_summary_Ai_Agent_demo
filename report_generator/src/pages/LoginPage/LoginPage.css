@@ -1,0 +1,24 @@
+/* src/pages/LoginPage/LoginPage.css */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .form-container {
+    width: 100%; /* allows the form to be responsive */
+    max-width: 340px; /* max width to contain the form elements */
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .login-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ... rest of the styles ... */
+  
