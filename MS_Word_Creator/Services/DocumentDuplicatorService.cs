@@ -23,6 +23,7 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IChatGptService _chatGptSercice;
+    private readonly char[] _updatableElements = { '[', ']', '*' };
     private bool isDrawing = false;
     private int _projectId = 0;
 
@@ -56,13 +57,13 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
         ReadDocument(templateFile);
 
         var data = _projectRepository.GetDocumentParts(_projectId).ToList();//.Where(x => x.IsDrawing == false).ToList(); //.Where(x => x.IsDrawing == false)
-        List<string> response = await _chatGptSercice.Request(_projectRepository.GetMustBeSentParts(_projectId).Select(x => x.Text).ToList());
+        List<string> response = await _chatGptSercice.Request(_projectRepository.GetMustBeSentParts(_projectId).Select(x => x.Paragraph).ToList());
         _projectRepository.UpdateResponses(_projectId, response);
 
-        UpdateDocument(templateFile, response, reportFile);
+        UpdateDocument(templateFile, reportFile);
     }
 
-    private void UpdateDocument(string sourcePath, List<string> response, string destinationPath)
+    private void UpdateDocument(string sourcePath, string destinationPath)
     {
         using var sourceDocument = WordprocessingDocument.Open(sourcePath, false);
 
@@ -77,105 +78,38 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
             // If the part is a main document part, modify its content
             if (destinationPart is MainDocumentPart)
             {
-                UpdateContent((MainDocumentPart)destinationPart, response);
+                UpdateContent((MainDocumentPart)destinationPart);
             }
         }
     }
 
-    private void UpdateContent(MainDocumentPart mainPart, List<string> response)
+    private void UpdateContent(MainDocumentPart mainPart)
     {
-        var lastElement = elementEnum.None;
-        var chatGptResponseIndex = -1;
-        var datasetIndex = 0;
-        var paragraphIndex = 0;
+        var elementIndex = -1;
 
         foreach (var element in mainPart.Document.Body.Elements())
         {
             if (element is Paragraph paragraph)
             {
-                if (string.IsNullOrEmpty(GetParagraphText(paragraph)))
+                elementIndex += 1;
+                var part = _projectRepository.GetDocumentPart(_projectId, elementIndex);
+
+                if (part.HasToGetUpdated)
                 {
-                    continue;
+                    SetParagraphText(paragraph, part.GPT_Reponse);
                 }
-
-                bool paragraphNeedsAnUpdate = XmlElementValueShouldBeUpdated(datasetIndex);
-                if (lastElement != elementEnum.Paragraph)
-                {
-                    // reset
-                    paragraphIndex = 0;
-                    //datasetIndex += 1;
-
-                    // if next element needs an update
-                    if (paragraphNeedsAnUpdate)
-                    {
-                        chatGptResponseIndex += 1;
-                    }
-                }
-
-                if (paragraphNeedsAnUpdate)
-                {
-                    string updatedParagraph = response.ToArray()[chatGptResponseIndex].Split('\n')[paragraphIndex];
-                    // index 1 to pass PARAGRAPH cell value. Paragraphs always have 2 cells
-                    updatedParagraph = updatedParagraph.Split("^")[1];
-                    SetParagraphText(paragraph, updatedParagraph);
-
-                    paragraphIndex += 1;
-                }
-
-                lastElement = elementEnum.Paragraph;
             }
             else if (element is Table table)
             {
-                if (lastElement == elementEnum.Paragraph)
-                {
-                    datasetIndex += 1;
-                }
-
-                bool tableShouldBeUpdated = XmlElementValueShouldBeUpdated(datasetIndex);
-                // if next element needs an update
-                if (tableShouldBeUpdated)
-                {
-                    chatGptResponseIndex += 1;
-                }
-                else
-                {
-                    datasetIndex += 1;
-                    lastElement = elementEnum.Table;
-                    continue;
-                }
-
-                int rowIndex = 0;
-                string updatedTable = response.ToArray()[chatGptResponseIndex];
-
                 foreach (TableRow row in table.Elements<TableRow>())
                 {
-                    string updatedRow = updatedTable.Split('\n')[rowIndex];
-                    // starting from 1 to pass ROW{i} value
-                    int cellIndex = 1;
-
-                    foreach (var cell in row.Elements())
+                    elementIndex += 1;
+                    var part = _projectRepository.GetDocumentPart(_projectId, elementIndex);
+                    if (part.HasToGetUpdated)
                     {
-                        if (tableShouldBeUpdated)
-                        {
-                            if (cell is TableCell tableCell)
-                            {
-                                string updatedCell = updatedRow.Split('^')[cellIndex];
-                                SetTableCellText(tableCell, updatedCell);
-                                cellIndex += 1;
-                            }
-                            else if (cell is SdtCell sdtCell)
-                            {
-                                string updatedCell = updatedRow.Split('^')[cellIndex];
-                                SetSdtCellText(sdtCell, updatedCell);
-                                cellIndex += 1;
-                            }
-                        }
+                        SetRowText(row, part.GPT_Reponse);
                     }
-                    rowIndex += 1;
                 }
-
-                datasetIndex += 1;
-                lastElement = elementEnum.Table;
             }
         }
     }
@@ -194,105 +128,88 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
 
     private void CollectInformation(MainDocumentPart mainPart)
     {
-        var lastElement = elementEnum.None;
-        string paragrapghData = "";
-        int i = 1;
-
         foreach (var element in mainPart.Document.Body.Elements())
         {
             if (element is Paragraph paragraph)
             {
-                if (lastElement != elementEnum.Paragraph)
-                {
-                    if (paragrapghData != "")
-                    {
-                        _projectRepository.AddDocumentPart(_projectId,
-                            paragrapghData,
-                            MustBeSentToChatGpt(paragrapghData),
-                            false,
-                            string.Empty
-                        );
-                    }
-
-                    paragrapghData = "";
-                    i = 1;
-                }
-
-                lastElement = elementEnum.Paragraph;
-
                 var paragraphText = GetParagraphText(paragraph);
-                if (!string.IsNullOrEmpty(paragraphText))
-                {
-                    paragraphText = $"PARAGRAPH{i}:^{paragraphText}";
-                    paragrapghData += paragraphText + '\n';
-                }
-
-                i += 1;
+                _projectRepository.AddDocumentPart(_projectId,
+                    paragraphText,
+                    HasUpdatableElelent(paragraphText),
+                    ParagraphHasDrawing(paragraph),
+                    false,
+                    string.Empty
+                );
             }
             else if (element is Table table)
             {
-                if (lastElement == elementEnum.Paragraph)
-                {
-                    if (paragrapghData != "")
-                    {
-                        _projectRepository.AddDocumentPart(_projectId,
-                            paragrapghData,
-                            MustBeSentToChatGpt(paragrapghData),
-                            false,
-                            string.Empty
-                        );
-                        //DocumentsParts.Add((paragrapghData, MustBeSentToChatGpt(paragrapghData), false));
-                        paragrapghData = "";
-                    }
-                }
-
-                lastElement = elementEnum.Table;
-
-                string tableData = "";
-                string csvRow = "";
-                int j = 1;
-
                 //var columns = table.Elements<TableGrid>().FirstOrDefault().Elements<GridColumn>().Count();
                 foreach (TableRow row in table.Elements<TableRow>())
                 {
-                    csvRow = $"ROW_{j}: ";
-                    foreach (var cell in row.Elements())
-                    {
-                        if (cell is TableCell tableCell)
-                        {
-                            string cellText = GetTableCellText(tableCell);
-                            csvRow += "^" + cellText;
-                        }
-                        else if (cell is SdtCell sdtCell)
-                        {
-                            string cellText = GetSdtCellText(sdtCell);
-
-                            csvRow += "^" + cellText;
-                        }
-                    }
-
-                    j += 1;
-                    tableData += csvRow + '\n';
+                    string csvRow = GetRowText(row);
+                    _projectRepository.AddDocumentPart(_projectId,
+                        csvRow,
+                        HasUpdatableElelent(csvRow),
+                        RowHasDrawing(row),
+                        true,
+                        string.Empty
+                    );
                 }
+            }
+        }
+    }
 
-                //DocumentsParts.Add((tableData, MustBeSentToChatGpt(tableData), isDrawing));
-                _projectRepository.AddDocumentPart(_projectId,
-                    tableData,
-                     MustBeSentToChatGpt(paragrapghData),
-                     isDrawing,
-                     string.Empty
-                );
-                isDrawing = false;
-                tableData = "";
+    private bool ParagraphHasDrawing(Paragraph paragraph)
+    {
+        foreach (var element in paragraph.Elements())
+        {
+            if (element is Run run)
+            {
+                // is picture
+                if (run.Elements<DocumentFormat.OpenXml.Wordprocessing.Drawing>().Count() > 0)
+                {
+                    return true;
+                }
             }
         }
 
-        lastElement = elementEnum.None;
+        return false;
+    }
+    
+    private bool RowHasDrawing(TableRow row)
+    {
+        foreach (var cell in row.Elements())
+        {
+            if (cell is TableCell tableCell)
+            {
+                if (CellHasDrawing(tableCell))
+                    return true;
+            }
+            else if (cell is SdtCell sdtCell)
+            {
+            }
+        }
+
+        return false;
     }
 
-    private bool MustBeSentToChatGpt(string stringData) => stringData.Contains("[") && stringData.Contains("]") || stringData.Contains("***");
-    private bool XmlElementValueShouldBeUpdated(int datasetIndex) => _projectRepository.GetDocumentParts(_projectId).Select(x => x.MustBeSent)
-        .ToArray()[datasetIndex] && !_projectRepository.GetDocumentParts(_projectId).Select(x => x.IsDrawing).ToArray()[datasetIndex];
+    private bool CellHasDrawing(TableCell cell)
+    {
+        foreach (var element in cell.Elements())
+        {
+            if (element is Paragraph paragraph)
+            {
+                if(ParagraphHasDrawing(paragraph))
+                    return true;
+            }
+            else if (element is Table table)
+            {
+
+            }
+        }
+
+        return false;
+    }
 
     private string GetParagraphText(Paragraph paragraph)
     {
@@ -302,15 +219,9 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
         {
             if (element is Run run)
             {
-                // is picture
-                if (run.Elements<DocumentFormat.OpenXml.Wordprocessing.Drawing>().Count() > 0)
-                {
-                    isDrawing = true;
-                }
-
                 foreach (var text in run.Elements<Text>())
                 {
-                    if (!text.Text.Contains("[") && !text.Text.Contains("]") && text.Text.Contains("***"))
+                    if (HasUpdatableElelent(text.Text))
                     {
                         sb.Append("[" + text.Text + "]");
                     }
@@ -333,6 +244,82 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
         }
 
         return sb.ToString();
+    }
+
+    private string GetRowText(TableRow row)
+    {
+        string csvRow = "";
+        foreach (var cell in row.Elements())
+        {
+            if (cell is TableCell tableCell)
+            {
+                string cellText = GetTableCellText(tableCell);
+                csvRow += "^" + cellText;
+            }
+            else if (cell is SdtCell sdtCell)
+            {
+                string cellText = GetSdtCellText(sdtCell);
+
+                csvRow += "^" + cellText;
+            }
+        }
+
+        return csvRow;
+    }
+
+    private string GetSdtCellText(SdtCell cell)
+    {
+        var sb = new System.Text.StringBuilder();
+
+        foreach (var sdtContentCell in cell.Elements<SdtContentCell>())
+        {
+            foreach (var paragraph in sdtContentCell.Elements<TableCell>().SingleOrDefault().Elements<Paragraph>())
+            {
+                var paragraphText = GetParagraphText(paragraph);
+                sb.Append("[" + paragraphText + "]");
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private string GetTableCellText(TableCell cell)
+    {
+        var sb = new System.Text.StringBuilder();
+
+        foreach (var element in cell.Elements())
+        {
+            if (element is Paragraph paragraph)
+            {
+                sb.Append(GetParagraphText(paragraph));
+            }
+            else if (element is Table table)
+            {
+
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private void SetRowText(TableRow row, string rowText)
+    {
+        int iCell = -1;
+        var cellTexts = rowText.Split("^");
+
+        foreach (var cell in row.Elements())
+        {
+            if (cell is TableCell tableCell)
+            {
+                iCell += 1;
+                SetTableCellText(tableCell, cellTexts[iCell]);
+            }
+            else if (cell is SdtCell sdtCell)
+            {
+                iCell += 1;                
+                SetSdtCellText(sdtCell, cellTexts[iCell]);
+            }
+        }
     }
 
     private void SetParagraphText(Paragraph? paragraph, string newText)
@@ -358,42 +345,7 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
         }
     }
 
-    private string GetSdtCellText(SdtCell cell)
-    {
-        var sb = new System.Text.StringBuilder();
-
-        foreach (var sdtContentCell in cell.Elements<SdtContentCell>())
-        {
-            foreach (var paragraph in sdtContentCell.Elements<TableCell>().SingleOrDefault().Elements<Paragraph>())
-            {
-                string paragraphText = GetParagraphText(paragraph);
-                if (paragraphText != "")
-                    sb.Append("[" + paragraphText + "]");
-            }
-        }
-
-        return sb.ToString();
-    }
-
-    private string GetTableCellText(TableCell cell)
-    {
-        var sb = new System.Text.StringBuilder();
-        foreach (var element in cell.Elements())
-        {
-            if (element is Paragraph paragraph)
-            {
-                sb.Append(GetParagraphText(paragraph));
-            }
-            else if (element is Table table)
-            {
-
-            }
-        }
-
-        return sb.ToString();
-    }
-
-    private void SetTableCellText(TableCell cell, string newText)
+    private void SetTableCellText(TableCell cell, string gptResponse)
     {
         //for now, we replace all paragraphs with only one
         foreach (var paragraph in cell.Elements<Paragraph>().Skip(1).ToList())
@@ -403,7 +355,7 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
 
         // Check if the cell already contains a paragraph
         Paragraph para = cell.Elements<Paragraph>().FirstOrDefault();
-        SetParagraphText(para, newText);
+        SetParagraphText(para, gptResponse);
 
         if (para == null)
         {
@@ -427,5 +379,16 @@ public class DocumentDuplicatorService : IDocumentDuplicatorService
         {
             cell.Append(para);
         }
+    }
+
+    private bool HasUpdatableElelent(string text)
+    {
+        foreach (char ch in _updatableElements)
+        { 
+            if(text.Contains(ch))
+                return true;
+        }
+
+        return false;
     }
 }

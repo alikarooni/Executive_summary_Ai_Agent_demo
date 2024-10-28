@@ -12,6 +12,6 @@ namespace MS_Word_Creator.Entities
         public string ProjectName { get; set; }
         public string ProjectType { get; set; }
         public List<string> ProjectFiles { get; set; } = new();
-        public List<DocumentPart> DocumentParts { get; set; } = new();
+        public List<DocumentParagraphs> DocumentParts { get; set; } = new();
     }
 }

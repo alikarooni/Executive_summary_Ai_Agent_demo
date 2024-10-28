@@ -14,9 +14,10 @@ namespace MS_Word_Creator.Repositories
         Task<int> AddProject(string projectName, string projectType, IFormFileCollection formFiles);
         Task<Project> GetProject(int projectId);
 
-        void AddDocumentPart(int projectId, string text, bool mustBeSent, bool isDrawing, string response);
-        List<DocumentPart> GetDocumentParts(int projectId);
-        List<DocumentPart> GetMustBeSentParts(int projectId);
+        void AddDocumentPart(int projectId, string paragraph, bool hasToGetUpdated, bool hasDrawing, bool isPartOfATable, string gpt_Reponse);
+        DocumentParagraphs GetDocumentPart(int projectId, int partId);
+        List<DocumentParagraphs> GetDocumentParts(int projectId);
+        List<DocumentParagraphs> GetMustBeSentParts(int projectId);
         void UpdateResponses(int projectId, List<string> responses);
     }
 
@@ -66,38 +67,45 @@ namespace MS_Word_Creator.Repositories
         }
 
 
-        public void AddDocumentPart(int projectId, string text, bool mustBeSent, bool isDrawing, string response)
+        public void AddDocumentPart(int projectId, string paragraph, bool hasToGetUpdated, bool hasDrawing, bool isPartOfATable, string gpt_Reponse)
         {
             var project = Projects.First(x => x.ProjectId == projectId);
-            project.DocumentParts.Add(new DocumentPart
+            project.DocumentParts.Add(new DocumentParagraphs
             {
-                Text = text,
-                MustBeSent = mustBeSent,
-                IsDrawing = isDrawing,
-                Reponse = response
+                Paragraph = paragraph,
+                HasToGetUpdated = hasToGetUpdated,
+                HasDrawing = hasDrawing,
+                IsTableRow = isPartOfATable,
+                GPT_Reponse = gpt_Reponse
             });
         }
 
-        public List<DocumentPart> GetDocumentParts(int projectId)
+        public DocumentParagraphs GetDocumentPart(int projectId, int partId)
+        {
+            var project = Projects.First(x => x.ProjectId == projectId);
+            return project.DocumentParts.ElementAt(partId);
+        }
+        
+        public List<DocumentParagraphs> GetDocumentParts(int projectId)
         {
             var project = Projects.First(x => x.ProjectId == projectId);
             return project.DocumentParts;
         }
 
-        public List<DocumentPart> GetMustBeSentParts(int projectId)
+        public List<DocumentParagraphs> GetMustBeSentParts(int projectId)
         {
             var project = Projects.First(x => x.ProjectId == projectId);
-            return project.DocumentParts.Where(x => x.IsDrawing != true).Where(x => x.MustBeSent == true).ToList();
+            return project.DocumentParts.Where(x => x.HasDrawing != true).Where(x => x.HasToGetUpdated == true).ToList();
         }
 
         public void UpdateResponses(int projectId, List<string> responses)
         {
             try
             {
-                List<DocumentPart> mustBeSentParts = GetMustBeSentParts(projectId);
+                List<DocumentParagraphs> mustBeSentParts = GetMustBeSentParts(projectId);
                 for (int i = 0; i < mustBeSentParts.Count(); i++)
                 {
-                    mustBeSentParts[i].Reponse = responses[i];
+                    mustBeSentParts[i].GPT_Reponse = responses[i];
                 }
             }
             catch { }

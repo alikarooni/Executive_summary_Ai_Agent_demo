@@ -65,6 +65,9 @@ def ask_chatgpt(tables):
     CHATGPT_API_KEY = "sk-proj-QPEtKvOLNtRkiCO54rXET3BlbkFJaJ2x403FPmHh80D8h6aX"
     client = OpenAI(api_key=CHATGPT_API_KEY)
 
+    start = 0
+    end = 0
+
     updated_tables = []
     for i, row in enumerate(tables):
         if(1 > 0):
@@ -78,15 +81,12 @@ def ask_chatgpt(tables):
             f'''
         Rules:
             - Only and only use provided document to answer questions
-            - the question is provided in the csv format text. REMEMBER, I USE ^ AS DELIMITER.
-            - Your task it to fill the gap -anything between [ and ] - in the question text. Sometimes you HAVE TO WRITE ADDITIONAL ONE OR TWO MORE SENTENCES/PROVIDE LIST ITEMS. BE CAREFUL AND DO YOUR TASK CAREFULLY
-            - Your only response will be in JSON format. DO NOT SAY ONE MORE WORD.
-            - Not all rows have GAPs. You will NOT TOUCH THEM.
-            - YOUR REPONSE WILL BE LIKE: 
-            {{ "ROW_1": "SOME TEXT [MISSING_VALUE] SOME TEXT [MISSING_VALUE]  SOME"
-            "ROW_2": "SOME TEXT [MISSING_VALUE] SOME TEXT [MISSING_VALUE]  SOME", etc}}
+            - REMEMBER, I USE ^ AS DELIMITER. Respect ^ whenever you see it!
+            - Your task it to fill the text between [ and ]. Sometimes you HAVE TO WRITE ADDITIONAL sentences/list items.
+            - Remove [ and ] in the your reponses.
+            - Wrap your response between {{}} 
             - Never ever shorten the answer.
-            - Remove [ and ] in the your reponse .
+            - Do not say a WORD. Just return my text with your responses included
             Document: {document} \n'''},
         {"role": "user", "content": f'''Question: Fill the gap in the following text, based on the document: {row}''' }])
 

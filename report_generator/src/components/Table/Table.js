@@ -8,7 +8,7 @@ const Table = ({ data }) => {
   return (
     <div className="table">
       {data['documentParts'] && data['documentParts'].map((row, index) => (
-        <Row key={index} leftContent={row.text} rightContent={row.reponse} />
+        <Row key={index} leftContent={row.paragraph} rightContent={row.gpT_Reponse} updatable={row.hasToGetUpdated}/>
       ))}
     </div>
   );
