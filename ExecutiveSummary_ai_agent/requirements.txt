@@ -1,0 +1,4 @@
+tika
+flask
+flask_cors
+openai

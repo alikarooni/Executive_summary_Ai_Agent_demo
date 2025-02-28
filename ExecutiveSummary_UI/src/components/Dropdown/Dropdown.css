@@ -1,0 +1,15 @@
+.dropdown {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background: url('data:image/svg+xml;utf8,<svg ...></svg>') no-repeat right;
+  background-size: 12px;
+  background-position: right 10px center;
+  box-sizing: border-box;
+}

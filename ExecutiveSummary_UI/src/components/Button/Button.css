@@ -1,0 +1,17 @@
+/* src/components/Button/Button.css */
+.button {
+  padding: 10px 15px; /* uniform padding */
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff; /* blue color */
+  color: white;
+  cursor: pointer;
+  font-size: 16px; /* matching font size with input */
+  text-align: center;
+  display: inline-block; /* allows the button to size with its content */
+  margin-bottom: 10px; /* maintains spacing */
+}
+
+.button:hover {
+  background-color: #0069d9; /* a slightly darker blue on hover */
+}

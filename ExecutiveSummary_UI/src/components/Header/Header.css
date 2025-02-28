@@ -1,0 +1,33 @@
+/* src/components/Header/Header.css */
+.header {
+  position: fixed; /* Or `absolute` if fixed is not desired */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10; /* Make sure it's above other elements */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px; /* Add padding inside the header */
+  display: flex;
+  justify-content: space-between; /* This should keep items spaced out */
+  align-items: center;
+  padding: 0 20px; /* Add padding inside the header */
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-icon {
+  width: 50px; /* Adjust the size as needed */
+  height: auto;
+  margin-right: 10px; /* Adjust space between icon and username text */
+}
